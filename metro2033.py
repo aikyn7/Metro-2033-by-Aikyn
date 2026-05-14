@@ -1,9 +1,11 @@
 import pygame
 import sys
 import os
+import random 
 
 from player import Player
 from settings import *
+from enemy import Enemy
 
 
 def main():
@@ -98,11 +100,10 @@ def main():
     add_wall_tile(5,7)
     add_wall_tile(5,8)
 
-    
-    
-    
-    
-    
+    # 3 sec
+    SPAWN_ENEMY = pygame.USEREVENT + 1
+    pygame.time.set_timer(SPAWN_ENEMY, 3000)
+
     #player
     player = Player(
         path_to_player,
@@ -125,6 +126,12 @@ def main():
 
             if event.type == pygame.QUIT:
                 running = False
+
+            #timer
+            if event.type == SPAWN_ENEMY:
+                spawn_x = random.randint(0, map_width)
+                new_zombie = Enemy((spawn_x, 2000), walls, player)
+                all_sprites.add(new_zombie)
 
         all_sprites.update()
 
@@ -168,7 +175,7 @@ def main():
                     sprite.rect.y - camera_y
                 )
             )
-
+        
         pygame.display.flip()
 
         clock.tick(FPS)
