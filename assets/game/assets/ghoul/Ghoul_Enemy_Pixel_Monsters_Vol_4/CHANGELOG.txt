@@ -1,0 +1,16 @@
+Ghoul Enemy | Pixel Monsters Vol. 4 CHANGELOG
+============================================
+
+Version 1.0.0 - 2026-02-08
+--------------------------
+-Release version.
+-Included animations:
+	-Idle
+	-Walk
+	-Jump / Land
+	-Attack
+	-Hurt
+	-Death
+	-Bone projectile
+	
+
