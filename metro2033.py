@@ -71,6 +71,39 @@ def main():
             )
         )
 
+    #collison
+    for col in range(0, 24):
+        add_wall_tile(col, 4)
+
+    for row in range(4, 12):
+        for col in range(0, 3):
+            add_wall_tile(col, row)
+
+    for row in range(6, 16):
+        add_wall_tile(11, row)
+        add_wall_tile(12, row)
+
+    for row in range(3, 16):
+        for col in range(19, 24):
+            add_wall_tile(col, row)
+            
+    for col in range(19, 24):
+        add_wall_tile(col, 2)
+    for col in range(0, 24):
+        add_wall_tile(col, 15)
+    
+    add_wall_tile(3,6)
+    add_wall_tile(4,6)
+    add_wall_tile(5,6)
+    add_wall_tile(5,7)
+    add_wall_tile(5,8)
+
+    
+    
+    
+    
+    
+    #player
     player = Player(
         path_to_player,
         16,
