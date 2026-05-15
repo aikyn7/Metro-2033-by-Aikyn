@@ -6,6 +6,7 @@ import random
 from player import Player
 from settings import *
 from enemy import Enemy
+from gun import Gun
 
 
 def main():
@@ -113,6 +114,8 @@ def main():
         map_width,
         map_height
     )
+    #gun
+    gun = Gun(player)
 
     all_sprites = pygame.sprite.Group()
 
@@ -161,10 +164,13 @@ def main():
             )
         )
 
+        gun.update(camera_x, camera_y)
+
         screen.blit(
             bg_image,
             (-camera_x, -camera_y)
         )
+
 
         for sprite in all_sprites:
 
@@ -175,6 +181,7 @@ def main():
                     sprite.rect.y - camera_y
                 )
             )
+        gun.draw(screen, camera_x, camera_y)
         
         pygame.display.flip()
 

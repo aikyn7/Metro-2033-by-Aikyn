@@ -16,3 +16,6 @@ etc.
 
 Each row contains evenly spaced frames corresponding to the animation for that specific state and direction. 
 This structured layout makes it easy to extract frames programmatically for smooth animation implementation.
+git add .
+git commit -m "just make gun sprite for game"
+git push
