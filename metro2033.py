@@ -7,6 +7,7 @@ from player import Player
 from settings import *
 from enemy import Enemy
 from gun import Gun
+from bullet import Bullet
 
 
 def main():
@@ -124,69 +125,49 @@ def main():
     running = True
 
     while running:
-
+        # 1. Обработка событий
         for event in pygame.event.get():
-
             if event.type == pygame.QUIT:
                 running = False
-
-            #timer
             if event.type == SPAWN_ENEMY:
                 spawn_x = random.randint(0, map_width)
                 new_zombie = Enemy((spawn_x, 2000), walls, player)
                 all_sprites.add(new_zombie)
 
+        # 2. Обновление логики
         all_sprites.update()
+        
+        camera_x = int(player.rect.centerx - SCREEN_WIDTH // 2)
+        camera_y = int(player.rect.centery - SCREEN_HEIGHT // 2)
+        camera_x = max(0, min(camera_x, map_width - SCREEN_WIDTH))
+        camera_y = max(0, min(camera_y, map_height - SCREEN_HEIGHT))
 
-        camera_x = int(
-            player.rect.centerx
-            - SCREEN_WIDTH // 2
-        )
+        # Получаем пули и СРАЗУ добавляем их в группу
+        new_bullets = gun.update(camera_x, camera_y)
+        if new_bullets:
+            for bullet in new_bullets:
+                all_sprites.add(bullet)
 
-        camera_y = int(
-            player.rect.centery
-            - SCREEN_HEIGHT // 2
-        )
+        # 3. Отрисовка
+        # Сначала фон
+        screen.blit(bg_image, (-camera_x, -camera_y))
 
-        camera_x = max(
-            0,
-            min(
-                camera_x,
-                map_width - SCREEN_WIDTH
-            )
-        )
-
-        camera_y = max(
-            0,
-            min(
-                camera_y,
-                map_height - SCREEN_HEIGHT
-            )
-        )
-
-        gun.update(camera_x, camera_y)
-
-        screen.blit(
-            bg_image,
-            (-camera_x, -camera_y)
-        )
-
-
+        # Затем все спрайты (игрок, зомби, пули)
         for sprite in all_sprites:
-
             screen.blit(
                 sprite.image,
-                (
-                    sprite.rect.x - camera_x,
-                    sprite.rect.y - camera_y
-                )
+                (sprite.rect.x - camera_x, sprite.rect.y - camera_y)
             )
+
+        # Затем пушка поверх игрока
         gun.draw(screen, camera_x, camera_y)
+        # И в конце интерфейс
+        gun.draw_ui(screen)
         
         pygame.display.flip()
-
+        
+        # 4. Ограничение FPS (КРИТИЧНО для стабильности)
         clock.tick(FPS)
-
     pygame.quit()
 
     sys.exit()
