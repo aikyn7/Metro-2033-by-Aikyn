@@ -105,6 +105,7 @@ def main():
     # 3 sec
     SPAWN_ENEMY = pygame.USEREVENT + 1
     pygame.time.set_timer(SPAWN_ENEMY, 3000)
+    current_spawn_delay = 3000
 
     #player
     player = Player(
@@ -149,6 +150,10 @@ def main():
                         if enemy.health <= 0:
                             enemy.kill() 
                             score += 1
+                            new_delay = max(600, 3000 - (score * 100))
+                            if new_delay != current_spawn_delay:
+                                current_spawn_delay = new_delay
+                                pygame.time.set_timer(SPAWN_ENEMY, current_spawn_delay)
         
         camera_x = int(player.rect.centerx - SCREEN_WIDTH // 2)
         camera_y = int(player.rect.centery - SCREEN_HEIGHT // 2)
