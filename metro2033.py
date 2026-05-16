@@ -121,6 +121,7 @@ def main():
     all_sprites = pygame.sprite.Group()
     enemies_group = pygame.sprite.Group()
     all_sprites.add(player)
+    score = 0
 
     running = True
 
@@ -147,6 +148,7 @@ def main():
                         
                         if enemy.health <= 0:
                             enemy.kill() 
+                            score += 1
         
         camera_x = int(player.rect.centerx - SCREEN_WIDTH // 2)
         camera_y = int(player.rect.centery - SCREEN_HEIGHT // 2)
@@ -184,6 +186,8 @@ def main():
         pygame.draw.rect(screen, (255, 255, 255), (hp_bar_x, hp_bar_y, hp_bar_width, hp_bar_height), 2)
 
         gun.draw_ui(screen)
+        score_surface = gun.font.render(f"SCORE: {score}", True, (255, 255, 255))
+        screen.blit(score_surface, (SCREEN_WIDTH - score_surface.get_width() - 20, 20))
         
         pygame.display.flip()
         
