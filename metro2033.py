@@ -137,18 +137,16 @@ def main():
         all_sprites.update()
         for sprite in all_sprites:
             if isinstance(sprite, Bullet):
-                # Проверяем, коснулась ли ЭТА пуля кого-то из группы enemies_group
-                # True в конце означает, что пуля уничтожится (исчезнет) при касании
                 hit_enemies = pygame.sprite.spritecollide(sprite, enemies_group, False)
                 
                 if hit_enemies:
-                    sprite.kill() # Уничтожаем пулю
+                    sprite.kill()
                     
                     for enemy in hit_enemies:
-                        enemy.health -= 10 # Наносим 10 урона зомби
+                        enemy.health -= 10 
                         
                         if enemy.health <= 0:
-                            enemy.kill() # Удаляем зомби из всех групп, если ХП кончилось
+                            enemy.kill() 
         
         camera_x = int(player.rect.centerx - SCREEN_WIDTH // 2)
         camera_y = int(player.rect.centery - SCREEN_HEIGHT // 2)
