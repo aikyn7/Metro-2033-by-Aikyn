@@ -8,6 +8,7 @@ from settings import *
 from enemy import Enemy
 from gun import Gun
 from bullet import Bullet
+from mainmenu import MainMenu
 
 
 def main():
@@ -21,6 +22,8 @@ def main():
     pygame.display.set_caption(
         "Metro 2033"
     )
+    menu = MainMenu(screen)
+    menu.run()
 
     clock = pygame.time.Clock()
 
