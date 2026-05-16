@@ -125,7 +125,6 @@ def main():
     running = True
 
     while running:
-        # 1. Обработка событий
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -134,7 +133,6 @@ def main():
                 new_zombie = Enemy((spawn_x, 2000), walls, player)
                 all_sprites.add(new_zombie)
 
-        # 2. Обновление логики
         all_sprites.update()
         
         camera_x = int(player.rect.centerx - SCREEN_WIDTH // 2)
@@ -142,31 +140,40 @@ def main():
         camera_x = max(0, min(camera_x, map_width - SCREEN_WIDTH))
         camera_y = max(0, min(camera_y, map_height - SCREEN_HEIGHT))
 
-        # Получаем пули и СРАЗУ добавляем их в группу
         new_bullets = gun.update(camera_x, camera_y)
         if new_bullets:
             for bullet in new_bullets:
                 all_sprites.add(bullet)
 
-        # 3. Отрисовка
-        # Сначала фон
         screen.blit(bg_image, (-camera_x, -camera_y))
 
-        # Затем все спрайты (игрок, зомби, пули)
+
         for sprite in all_sprites:
             screen.blit(
                 sprite.image,
                 (sprite.rect.x - camera_x, sprite.rect.y - camera_y)
             )
 
-        # Затем пушка поверх игрока
         gun.draw(screen, camera_x, camera_y)
-        # И в конце интерфейс
+        hp_bar_x = 20
+        hp_bar_y = screen.get_height() - 110
+        hp_bar_width = 200
+        hp_bar_height = 25
+
+        pygame.draw.rect(screen, (50, 0, 0), (hp_bar_x, hp_bar_y, hp_bar_width, hp_bar_height))
+
+        health_ratio = player.health / player.max_health
+        current_bar_width = int(hp_bar_width * health_ratio)
+
+        bar_color = (0, 255, 0) if player.health > 30 else (255, 0, 0)
+        pygame.draw.rect(screen, bar_color, (hp_bar_x, hp_bar_y, current_bar_width, hp_bar_height))
+
+        pygame.draw.rect(screen, (255, 255, 255), (hp_bar_x, hp_bar_y, hp_bar_width, hp_bar_height), 2)
+
         gun.draw_ui(screen)
         
         pygame.display.flip()
         
-        # 4. Ограничение FPS (КРИТИЧНО для стабильности)
         clock.tick(FPS)
     pygame.quit()
 

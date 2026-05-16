@@ -52,12 +52,13 @@ class Enemy(pygame.sprite.Sprite):
     def get_direction(self):
         player_vector = pygame.math.Vector2(self.player.rect.center)
         enemy_vector = pygame.math.Vector2(self.rect.center)
-        distance = (player_vector - enemy_vector).magnitude()
-
-        if distance < 600: # Радиус зрения зомби
-            self.direction = (player_vector - enemy_vector).normalize()
+        
+        heading = player_vector - enemy_vector
+        
+        if heading.length() > 0:
+            self.direction = heading.normalize()
         else:
-            self.direction = pygame.math.Vector2()
+            self.direction = pygame.math.Vector2(0, 0)
 
     def update_status(self):
         if self.direction.magnitude() == 0:
@@ -108,3 +109,27 @@ class Enemy(pygame.sprite.Sprite):
         self.update_status()
         self.move()
         self.animate()
+        now = pygame.time.get_ticks()
+        
+        # Создаем векторы позиций игрока и зомби
+        player_pos = pygame.math.Vector2(self.player.rect.center)
+        enemy_pos = pygame.math.Vector2(self.rect.center)
+        
+        # Считаем чистое расстояние в пикселях между ними
+        distance = player_pos.distance_to(enemy_pos)
+        
+        # Если зомби подошел ближе чем на 60 пикселей (настрой радиус под себя)
+        if distance <= 60:
+            # Чтобы хп не улетало за 1 секунду, делаем задержку ударов (кулдаун)
+            # Например, зомби бьет раз в 500 миллисекунд (полсекунды)
+            if not hasattr(self, 'last_attack_time'):
+                self.last_attack_time = 0
+                
+            if now - self.last_attack_time > 500: 
+                self.player.health -= 10 # Отнимаем 10 ХП
+                self.last_attack_time = now
+                
+                # Проверка на смерть игрока
+                if self.player.health < 0:
+                    self.player.health = 0
+        

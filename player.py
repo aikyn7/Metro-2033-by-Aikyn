@@ -5,15 +5,12 @@ from settings import *
 
 class Player(pygame.sprite.Sprite):
 
-    def __init__(
-        self,
-        sheet_path,
-        width,
-        height,
-        walls,
-        map_width,
-        map_height
-    ):
+    def __init__(self, sheet_path, width, height, walls, map_width, map_height):
+        super().__init__()
+        
+
+        self.max_health = 100
+        self.health = 100
 
         super().__init__()
 
