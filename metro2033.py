@@ -119,7 +119,7 @@ def main():
     gun = Gun(player)
 
     all_sprites = pygame.sprite.Group()
-
+    enemies_group = pygame.sprite.Group()
     all_sprites.add(player)
 
     running = True
@@ -132,8 +132,23 @@ def main():
                 spawn_x = random.randint(0, map_width)
                 new_zombie = Enemy((spawn_x, 2000), walls, player)
                 all_sprites.add(new_zombie)
+                enemies_group.add(new_zombie)
 
         all_sprites.update()
+        for sprite in all_sprites:
+            if isinstance(sprite, Bullet):
+                # Проверяем, коснулась ли ЭТА пуля кого-то из группы enemies_group
+                # True в конце означает, что пуля уничтожится (исчезнет) при касании
+                hit_enemies = pygame.sprite.spritecollide(sprite, enemies_group, False)
+                
+                if hit_enemies:
+                    sprite.kill() # Уничтожаем пулю
+                    
+                    for enemy in hit_enemies:
+                        enemy.health -= 10 # Наносим 10 урона зомби
+                        
+                        if enemy.health <= 0:
+                            enemy.kill() # Удаляем зомби из всех групп, если ХП кончилось
         
         camera_x = int(player.rect.centerx - SCREEN_WIDTH // 2)
         camera_y = int(player.rect.centery - SCREEN_HEIGHT // 2)
