@@ -132,8 +132,6 @@ def main():
     gun = Gun(player)
 
     pygame.mixer.init()
-
-    # 2. Собираем правильный путь к файлу музыки
     path_to_music = os.path.join(
         BASE_DIR,
         'assets',
@@ -145,8 +143,6 @@ def main():
     try:
         pygame.mixer.music.load(path_to_music)
         
-        # 4. Выставляем громкость от 0.0 (тишина) до 1.0 (максимум). 
-        # Поставим 0.4, чтобы музыка не глушила звуки выстрелов
         pygame.mixer.music.set_volume(0.4)
         
         pygame.mixer.music.play(loops=-1)
@@ -158,17 +154,26 @@ def main():
         'assets',
         'game',
         'sound',
-        'zombie_sound.mp3' # Укажи точное имя и расширение своего файла
+        'zombie_sound.mp3'
     )
     
     try:
-        # Используем pygame.mixer.Sound для коротких эффектов
         wave_sound = pygame.mixer.Sound(path_to_zombie_sound)
-        wave_sound.set_volume(0.7) # Громкость звука (от 0.0 до 1.0)
+        wave_sound.set_volume(0.7)
     except pygame.error as e:
         print(f"но саунд: {e}")
         wave_sound = None 
-
+    
+    
+    
+    path_to_player_death = os.path.join(BASE_DIR, 'assets', 'game', 'sound', 'player_death.mp3')
+    try:
+        player_death_sound = pygame.mixer.Sound(path_to_player_death)
+        player_death_sound.set_volume(0.8)
+    except pygame.error:
+        player_death_sound = None
+    
+    
     all_sprites = pygame.sprite.Group()
     enemies_group = pygame.sprite.Group()
     all_sprites.add(player)
@@ -178,6 +183,13 @@ def main():
     if wave_sound:
         wave_sound.play()
 
+
+    path_to_zombie_death = os.path.join(BASE_DIR, 'assets', 'game', 'sound', 'zombie_death.mp3')
+    try:
+        zombie_death_sound = pygame.mixer.Sound(path_to_zombie_death)
+        zombie_death_sound.set_volume(0.6)
+    except pygame.error:
+        zombie_death_sound = None
 
     running = True
 
@@ -203,6 +215,8 @@ def main():
                         enemy.health -= 10 
                         
                         if enemy.health <= 0:
+                            if zombie_death_sound:
+                                zombie_death_sound.play()
                             enemy.kill() 
                             score += 1
                             if score > 0 and score % 10 == 0:
@@ -252,7 +266,9 @@ def main():
         if player.health <= 0:
             if not game_over: 
                 game_over = True
-                pygame.mouse.set_visible(True)  
+                pygame.mouse.set_visible(True)
+                if player_death_sound:
+                    player_death_sound.play()  
                 if score > max_score:
                     max_score = score #система макс очков
 
