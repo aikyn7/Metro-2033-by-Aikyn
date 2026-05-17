@@ -36,6 +36,9 @@ def main():
 
     clock = pygame.time.Clock()
 
+    score = 0
+    max_score = 0
+    game_over = False
 
     path_to_bg = os.path.join(
         BASE_DIR,
@@ -195,6 +198,13 @@ def main():
         current_bar_width = int(hp_bar_width * health_ratio)
 
         bar_color = (0, 255, 0) if player.health > 30 else (255, 0, 0)
+        if player.health <= 0:
+            if not game_over: 
+                game_over = True
+                pygame.mouse.set_visible(True)  
+                if score > max_score:
+                    max_score = score #система макс очков
+
         pygame.draw.rect(screen, bar_color, (hp_bar_x, hp_bar_y, current_bar_width, hp_bar_height))
 
         pygame.draw.rect(screen, (255, 255, 255), (hp_bar_x, hp_bar_y, hp_bar_width, hp_bar_height), 2)
@@ -203,6 +213,85 @@ def main():
         crosshair.draw(screen)
         score_surface = gun.font.render(f"SCORE: {score}", True, (255, 255, 255))
         screen.blit(score_surface, (SCREEN_WIDTH - score_surface.get_width() - 20, 20))
+        #геймовер
+        if game_over:
+            overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+            overlay.set_alpha(200)
+            overlay.fill((15, 15, 15))
+            screen.blit(overlay, (0, 0))
+            
+            go_font = pygame.font.SysFont("Arial", 64, bold=True)
+            info_font = pygame.font.SysFont("Arial", 36, bold=True)
+            btn_font = pygame.font.SysFont("Arial", 42, bold=True)
+            
+            color_idle = (200, 200, 200)
+            color_hover = (255, 0, 0)
+            
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_clicked = pygame.mouse.get_pressed()[0] 
+            
+            go_surf = go_font.render("GAME OVER", True, (255, 0, 0))
+            score_surf = info_font.render(f"SCORE: {score}", True, (255, 255, 255))
+            max_surf = info_font.render(f"MAXIMUM SCORE: {max_score}", True, (255, 215, 0)) # Золотой цвет для рекорда
+            
+            go_rect = go_surf.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 140))
+            score_rect = score_surf.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 60))
+            max_rect = max_surf.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 10))
+            
+            screen.blit(go_surf, go_rect)
+            screen.blit(score_surf, score_rect)
+            screen.blit(max_surf, max_rect)
+            
+            # 4. СОЗДАЕМ КНОПКУ RESTART
+            rest_rect = pygame.Rect(0, 0, 200, 50)
+            rest_rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 70)
+            
+            if rest_rect.collidepoint(mouse_pos):
+                rest_surf = btn_font.render("RESTART", True, color_hover)
+                if mouse_clicked:
+                    #логика сброса
+                    score = 0
+                    game_over = False
+                    player.health = 100
+                    player.rect.x = 500
+                    player.rect.y = 500
+                    player.rect.center = (player.rect.x, player.rect.y)
+                    
+                    enemies_group.empty()
+                    all_sprites.empty() 
+                    all_sprites.add(player) 
+                    
+                    pygame.time.set_timer(SPAWN_ENEMY, 3000)
+                    pygame.mouse.set_visible(False)
+            else:
+                rest_surf = btn_font.render("RESTART", True, color_idle)
+                
+            screen.blit(rest_surf, rest_surf.get_rect(center=rest_rect.center))
+            
+            menu_rect = pygame.Rect(0, 0, 200, 50)
+            menu_rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 140)
+            
+            if menu_rect.collidepoint(mouse_pos):
+                menu_btn_surf = btn_font.render("MENU", True, color_hover)
+                if mouse_clicked:
+                    menu.run()
+                    
+                    #сброс в меню
+                    score = 0
+                    game_over = False
+                    player.health = 100
+                    player.rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+                    
+                    enemies_group.empty()
+                    all_sprites.empty()
+                    all_sprites.add(player)
+                    
+                    pygame.time.set_timer(SPAWN_ENEMY, 3000)
+                    pygame.mouse.set_visible(False)
+            else:
+                menu_btn_surf = btn_font.render("MENU", True, color_idle)
+                
+            screen.blit(menu_btn_surf, menu_btn_surf.get_rect(center=menu_rect.center))
         
         pygame.display.flip()
         
