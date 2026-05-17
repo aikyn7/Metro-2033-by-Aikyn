@@ -9,11 +9,16 @@ from enemy import Enemy
 from gun import Gun
 from bullet import Bullet
 from mainmenu import MainMenu
+from crosshair import Crosshair
 
 
 def main():
-
     pygame.init()
+    
+    BASE_DIR = os.path.dirname(
+        os.path.abspath(__file__)
+    )
+
 
     screen = pygame.display.set_mode(
         (SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -22,14 +27,15 @@ def main():
     pygame.display.set_caption(
         "Metro 2033"
     )
+    pygame.mouse.set_visible(False)
+
+    crosshair = Crosshair(BASE_DIR)
+
     menu = MainMenu(screen)
     menu.run()
 
     clock = pygame.time.Clock()
 
-    BASE_DIR = os.path.dirname(
-        os.path.abspath(__file__)
-    )
 
     path_to_bg = os.path.join(
         BASE_DIR,
@@ -194,6 +200,7 @@ def main():
         pygame.draw.rect(screen, (255, 255, 255), (hp_bar_x, hp_bar_y, hp_bar_width, hp_bar_height), 2)
 
         gun.draw_ui(screen)
+        crosshair.draw(screen)
         score_surface = gun.font.render(f"SCORE: {score}", True, (255, 255, 255))
         screen.blit(score_surface, (SCREEN_WIDTH - score_surface.get_width() - 20, 20))
         

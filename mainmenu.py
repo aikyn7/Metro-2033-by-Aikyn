@@ -32,6 +32,7 @@ class MainMenu:
 
     def run(self):
         menu_running = True
+        pygame.mouse.set_visible(True)
         while menu_running:
             self.screen.blit(self.bg_image, (0, 0))
             
@@ -51,6 +52,7 @@ class MainMenu:
                 self.screen.blit(self.start_surf_hover, self.start_rect)
                 if mouse_clicked:
                     menu_running = False
+                    pygame.mouse.set_visible(False)
             else:
                 self.screen.blit(self.start_surf_idle, self.start_rect)
                 
