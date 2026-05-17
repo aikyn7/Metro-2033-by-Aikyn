@@ -39,6 +39,17 @@ class Gun(pygame.sprite.Sprite):
         self.reload_start_time = 0
         self.shoot_cooldown = 0
         self.font = pygame.font.SysFont("Arial", 32, bold=True)
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        path_to_shoot = os.path.join(base_dir, 'assets', 'game', 'sound', 'ak_shoot.mp3')
+
+        try:
+            self.shoot_sound = pygame.mixer.Sound(path_to_shoot)
+            self.shoot_sound.set_volume(0.5)
+        except pygame.error as e:
+            print(f"no shoot {e}")
+            self.shoot_sound = None
+
+        self.gun_channel = pygame.mixer.Channel(1)
 
     def reload(self):
         if not self.is_reloading and self.current_ammo < self.max_ammo:
@@ -75,6 +86,10 @@ class Gun(pygame.sprite.Sprite):
                 direction = pygame.math.Vector2(1, 0).rotate(-angle)
                 bullet_pos = pygame.math.Vector2(self.player.rect.center) + direction * 45
                 bullets.append(Bullet(bullet_pos, angle))
+                if self.shoot_sound:
+                # play() запускает звук в отдельном канале, 
+                # поэтому клики могут накладываться друг на друга, создавая эффект очереди!
+                    self.shoot_sound.play()
         
         if now - self.last_shoot_time > self.shoot_duration:
             self.is_shooting = False

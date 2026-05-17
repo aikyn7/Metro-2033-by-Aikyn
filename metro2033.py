@@ -131,10 +131,53 @@ def main():
     #gun
     gun = Gun(player)
 
+    pygame.mixer.init()
+
+    # 2. Собираем правильный путь к файлу музыки
+    path_to_music = os.path.join(
+        BASE_DIR,
+        'assets',
+        'game',
+        'sound',
+        'music.mp3' 
+    )
+
+    try:
+        pygame.mixer.music.load(path_to_music)
+        
+        # 4. Выставляем громкость от 0.0 (тишина) до 1.0 (максимум). 
+        # Поставим 0.4, чтобы музыка не глушила звуки выстрелов
+        pygame.mixer.music.set_volume(0.4)
+        
+        pygame.mixer.music.play(loops=-1)
+    except pygame.error as e:
+        print(f"но мьюзик {e}")
+    
+    path_to_zombie_sound = os.path.join(
+        BASE_DIR,
+        'assets',
+        'game',
+        'sound',
+        'zombie_sound.mp3' # Укажи точное имя и расширение своего файла
+    )
+    
+    try:
+        # Используем pygame.mixer.Sound для коротких эффектов
+        wave_sound = pygame.mixer.Sound(path_to_zombie_sound)
+        wave_sound.set_volume(0.7) # Громкость звука (от 0.0 до 1.0)
+    except pygame.error as e:
+        print(f"но саунд: {e}")
+        wave_sound = None 
+
     all_sprites = pygame.sprite.Group()
     enemies_group = pygame.sprite.Group()
     all_sprites.add(player)
     score = 0
+
+
+    if wave_sound:
+        wave_sound.play()
+
 
     running = True
 
@@ -162,6 +205,14 @@ def main():
                         if enemy.health <= 0:
                             enemy.kill() 
                             score += 1
+                            if score > 0 and score % 10 == 0:
+                                if wave_sound:
+                                    wave_sound.play()
+                            
+                            new_delay = max(600, 3000 - (score * 100))
+                            if new_delay != current_spawn_delay:
+                                current_spawn_delay = new_delay
+                                pygame.time.set_timer(SPAWN_ENEMY, current_spawn_delay)
                             new_delay = max(600, 3000 - (score * 100))
                             if new_delay != current_spawn_delay:
                                 current_spawn_delay = new_delay
@@ -259,7 +310,10 @@ def main():
                     
                     enemies_group.empty()
                     all_sprites.empty() 
-                    all_sprites.add(player) 
+                    all_sprites.add(player)
+
+                    if wave_sound:
+                        wave_sound.play()
                     
                     pygame.time.set_timer(SPAWN_ENEMY, 3000)
                     pygame.mouse.set_visible(False)
